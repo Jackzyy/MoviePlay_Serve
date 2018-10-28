@@ -56,9 +56,7 @@ utils={
         if(html){
             let $ = cheerio.load(html);
             let movieDetails = $('#resize_vod');
-            let movies = $('.plau-ul-list').eq(0);
             let movieInfo = {}
-            let movieList = []
             //获取Movie详情
             
             movieDetails.find('.vod-n-l').each( function(item){
@@ -96,17 +94,32 @@ utils={
             })
 
             //获取电影列表
-            movies.find('li').each((index, item) =>{
-                let movie = $(item)
-                let movieHref = movie.find('a').attr('href')
-                let movieTitle = movie.find('a').attr('title')
-                let movieUrl = `${baseUrl}${movieHref}`
-                movieList.push({
-                    movieUrl,
-                    movieTitle
+            const findList = function(source){
+                let movieList = []
+                $(source).find('li').each((index, item) =>{
+                    let movie = $(item)
+                    let movieHref = movie.find('a').attr('href')
+                    let movieTitle = movie.find('a').attr('title')
+                    let movieUrl = `${baseUrl}${movieHref}`
+                    movieList.push({
+                        movieUrl,
+                        movieTitle
+                    })
+                })
+                return movieList
+            }
+
+            let playSource = []
+            $('.play-box').each((index, item) =>{
+                let source = $(item).find('.plau-ul-list')
+                let movieList = findList(source)
+                playSource.push({
+                    title:`在线${index + 1}`,
+                    movieList
                 })
             })
-            movieInfo.movieList = movieList
+
+            movieInfo.playSource = playSource
 
             //返回数组对象
             let detail = {
@@ -131,6 +144,16 @@ utils={
     getHome(html){
         if(html){
             let $ = cheerio.load(html);
+
+            //获取轮播图数据
+            let Broadcast = []
+            $('.focusList').find('li').each((index,item) =>{
+                Broadcast.push({
+                    img:$(item).find('a').find('img').attr('data-src'),
+                    title:$(item).find('span').text(),
+                    url:`${baseUrl}${$(item).find('a').attr('href')}`
+                })
+            })
 
             //电影热映
             let hot_Movie = []
@@ -208,12 +231,17 @@ utils={
                 movie:hot_Variety
             }
 
-            return [
+            let arr = [
                 hotMovie,
                 hotTV,
                 hotAnime,
                 hotVariety
             ]
+
+            return {
+                arr,
+                Broadcast
+            }      
         }
     },
 
@@ -255,15 +283,7 @@ utils={
     //获取轮播图数据
     getBroadcast(html){
         if(html){
-            let Broadcast = []
-            let $ = cheerio.load(html)
-            $('.focusList').find('li').each((index,item) =>{
-                Broadcast.push({
-                    img:$(item).find('a').find('img').attr('data-src'),
-                    title:$(item).find('span').text(),
-                    url:`${baseUrl}${$(item).find('a').attr('href')}`
-                })
-            })
+            
             return Broadcast
         }
     }

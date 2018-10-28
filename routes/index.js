@@ -6,6 +6,5 @@ router.use(require('./controller/movie/details'));
 router.use(require('./controller/movie/play'));
 router.use(require('./controller/home'))
 router.use(require('./controller/search'))
-router.use(require('./controller/focusList'))
 
 module.exports = router;
