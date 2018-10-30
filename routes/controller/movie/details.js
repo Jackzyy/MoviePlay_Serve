@@ -14,7 +14,8 @@ router.get('/detail', function(req, res, next) {
         let data = getDetail(html)
          res.json({
              code:200,
-             data
+             data,
+             Url
          });
     });
 

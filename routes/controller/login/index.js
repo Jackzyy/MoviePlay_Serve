@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var adminModel = require('../../../dataBase/model/admin')
 var movieModel = require('../../../dataBase/model/movie')
+var request = require('request')
 
 router.post('/login', (req, res) => {
     let user = {
@@ -65,20 +66,21 @@ router.post('/register', function(req, res, next) {
     })
 });
 
-router.get('/collectins', (req, res) => {
+router.get('/collections', (req, res) => {
     let user = req.session.user._id
     movieModel.find({user}).populate({
         path:'user',
         select:'-password'
     }).then(data =>{
-        res.json({
-            code:200,
-            data
-        });
+         res.json({
+             code:200,
+             data
+         });
     })
 });
 
-router.post('/collectins', (req, res) => {
+router.post('/collections', (req, res) => {
+    // console.log(req.body.url);
     let movieUrl = req.body.url
     let user = req.session.user._id
     let movie = {
@@ -86,12 +88,13 @@ router.post('/collectins', (req, res) => {
         movieUrl
     }
 
-    movieModel.findOne({user}).then(data =>{
-        if(data && data.movieUrl == movieUrl){
+    movieModel.find({user}).find({movieUrl}).then(data =>{
+        console.log(data);
+        if(data != ''){
             res.json({
                 code:200,
                 msg:'已经收藏过了'
-            });
+            })  
         }else{
             movieModel.create(movie).then(data =>{
                 res.json({
@@ -106,9 +109,47 @@ router.post('/collectins', (req, res) => {
                 });
             })
         }
-        
     })
 });
 
+router.get('/iscollections', (req, res) => {
+    let movieUrl = req.query.url
+    let user = req.session.user._id
+    let movie = {
+        user,
+        movieUrl
+    }
+    movieModel.find({user}).find({movieUrl}).then(data =>{
+        console.log(data);
+        if(data != ''){
+            res.json({
+                code:200,
+                isCollect:true
+            })
+        }else{
+            res.json({
+                code:200,
+                isCollect:false
+            });
+        }
+    })
+});
 
+router.post('/cancelCollect', (req, res) => {
+    let movieUrl = req.body.url
+    let user = req.session.user._id
+    let movie = {
+        user,
+        movieUrl
+    }
+
+    movieModel.find({user}).find({movieUrl}).then(data =>{
+        movieModel.deleteOne({_id:data[0]._id}).then(deldata =>{
+             res.json({
+                 code:200,
+                 msg:'取消收藏成功'
+             });
+        })
+    })
+})
 module.exports = router;

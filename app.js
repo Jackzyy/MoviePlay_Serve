@@ -40,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 //全局验证用户是否登录
 app.use('*', (req, res, next) => {
   let url = req.originalUrl
-  if(url == '/collectins' && !req.session.user){
+  if((url == '/collections'|| url == '/iscollections'|| url == '/cancelCollect') && !req.session.user){
      return res.json({
        code:201,
        msg:'用户未登录'
