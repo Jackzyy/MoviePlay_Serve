@@ -72,6 +72,10 @@ utils={
                 let movieUptime = reg.exec(movieDetail.find('.vw100').text())[0]
                 let movieSummary = movieDetail.find('.v-js.clear.yc').text()
 
+                //去除推广
+                let reg_sum = /kkkkwu.com观看影视更高清速度更快4K屋   /
+                movieSummary = movieSummary.replace(reg_sum, '')
+
                 // console.log(movieDetail.find('.vw100').text())
                 movieInfo = {
                     movieTitle,

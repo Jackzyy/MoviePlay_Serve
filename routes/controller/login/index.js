@@ -87,9 +87,7 @@ router.post('/collections', (req, res) => {
         user,
         movieUrl
     }
-
     movieModel.find({user}).find({movieUrl}).then(data =>{
-        console.log(data);
         if(data != ''){
             res.json({
                 code:200,
